@@ -45,6 +45,7 @@ Then:
     int a = mydict["a"];
     string s = mydict["s"];
     vector<int> = mydict["v"];
+    PyConfigure::Dict otherdict = mydict["delegated"];
     
 all python exceptions become C++ exceptions.
 
