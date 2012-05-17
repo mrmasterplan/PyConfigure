@@ -89,6 +89,7 @@ $(TESTFILE): $(TEST_O) $(SHLIBFILE)
 $(SHLIBFILE): $(OLIST) $(CENTER_O)
 	@echo "Making shared library: $(SHLIBFILE)"
 	@rm -f $(SHLIBFILE)
+	@mkdir -p $(dir $(SHLIBFILE))
 # ifneq (,$(findstring macosx,$(ARCH)))
 	@$(LD) $(LDFLAGS) -dynamiclib -single_module -undefined dynamic_lookup $(addprefix $(OBJDIR)/,$(OLIST)) $(OBJDIR)/$(CENTER_O) -o $(SHLIBFILE)
 # else
