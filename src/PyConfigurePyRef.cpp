@@ -1,7 +1,6 @@
-
-#include "PyConfigurePyRef.h"
-
 #include "Python.h"
+#include "PyConfigurePyRef.h"
+// #include <iostream>
 
 namespace PyConfigure {
     PyRef::PyRef() throw():
@@ -18,11 +17,24 @@ namespace PyConfigure {
     
     PyRef::~PyRef() throw()
     {
-        
+        Dec();
     }
+    
+    void PyRef::Dec() throw()
+    {
+        if(data != NULL){
+            // std::cout<<"decrementing "<<data<<std::endl;
+            
+            Py_DECREF(data);
+        }
+        data = NULL;
+    }
+    
     
     PyRef& PyRef::operator=(PyObject* obj) throw()
     {
+        Dec();
+        
         data = obj;
         // increment the reference count;
         return *this;
@@ -32,5 +44,21 @@ namespace PyConfigure {
     {
         return data;
     }
+    
+    PyObject* PyRef::NewRef() throw()
+    {
+        if( data!=NULL){
+            Py_INCREF(data);
+        }
+        return data;
+    }
+    
+    PyObject* PyRef::Steal() throw()
+    {
+        PyObject* tmp = data;
+        data=NULL;
+        return tmp;
+    }
+    
     
 }

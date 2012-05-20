@@ -13,6 +13,15 @@ namespace PyConfigure {
         PyRef& operator=(PyObject*) throw();
         
         operator PyObject*() const;
+        
+        operator bool() const { return data;};
+        
+        void Dec() throw();
+        
+        PyObject* NewRef() throw();
+        
+        PyObject* Steal() throw();
+
     private:
         PyObject* data;
     };

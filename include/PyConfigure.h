@@ -1,7 +1,8 @@
 #ifndef PYCONFIGURE_H_XRQ1SB5W
 #define PYCONFIGURE_H_XRQ1SB5W
 
-#include <Python.h>
+#include "ForwardPyObject.h"
+#include "PyConfigurePyRef.h"
 #include "PyConfigureResult.h"
 #include "PyConfigureException.h"
 
@@ -14,10 +15,13 @@ namespace PyConfigure {
         ~Dict() throw();
     
         Dict& operator = (const Dict&) throw();
-        Dict& operator = (PyObject*) throw();
+        Dict& operator = (PyObject*) throw(Exception);
         Dict& operator = (const char*) throw(Exception);
     
         Result operator[] (const char*) throw(Exception);
+
+    private:
+        PyRef m_py_dict;
     };
 
 }
