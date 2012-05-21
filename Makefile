@@ -26,7 +26,7 @@ SKIPCPPLIST = $(BINCPPFILE) $(TESTCPPFILE) $(SRCDIR)/$(CENTER_FILE).cpp
 SKIPHLIST   = 
 SHLIBFILE = ./lib/lib$(LIBRARY).so
 
-CXXFLAGS += -O2 -pipe -Wall -W -Woverloaded-virtual -pthread -m64 $(shell python-config --includes) -Wall -Wno-overloaded-virtual -Wno-unused
+CXXFLAGS += -O2 -pipe -Wall -W -Woverloaded-virtual -pthread -m64 $(shell python-config --includes)
 # CXXFLAGS += -O2 -pipe -Wall -W -Woverloaded-virtual -pthread -m64 -I/Users/simon/software/root/clang/include -Wall -Wno-overloaded-virtual -Wno-unused
 CPP = clang -E
 LD = clang++
@@ -83,7 +83,8 @@ $(EXECUTABLE): $(EXECUTABLE).o $(SHLIBFILE)
 # Rule to comile the tests
 $(TESTFILE): $(TEST_O) $(SHLIBFILE)
 	@echo "Making $(TESTFILE)"
-	@clang++ -L$(dir $(SHLIBFILE)) -l$(LIBRARY) -o $@ $(OBJDIR)/$(TEST_O) $(CXXFLAGS)
+	@clang++ -L$(dir $(SHLIBFILE)) -l$(LIBRARY) -o $@ $(OBJDIR)/$(TEST_O)  -O2 -pipe -Wall -W -Woverloaded-virtual -pthread -m64
+#	@clang++ -L$(dir $(SHLIBFILE)) -l$(LIBRARY) -o $@ $(OBJDIR)/$(TEST_O) $(CXXFLAGS)
 
 # Rule to combine objects into a unix shared library
 $(SHLIBFILE): $(OLIST) $(CENTER_O)

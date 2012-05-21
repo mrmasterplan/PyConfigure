@@ -1,32 +1,32 @@
 #include <iostream>
 #include <string>
-#include "include/PyConfigure.h"
+#include "../include/ConfigurePyDict.h"
 
 int main (int /*argc*/, char const * /*argv*/ [])
 {
     std::cout<<"This is unittest."<<std::endl;
-    PyConfigure::Dict dict;
-    
-    try{
+    ConfigurePy::Dict dict;
+
+    try {
         std::cout<<"broken construct..."<<std::endl;
         dict=
             "a=5\n"
             "s\n";
         std::cout<<"... is working"<<std::endl;
-    }catch(PyConfigure::Exception& e){
+    } catch(ConfigurePy::Exception& e) {
         std::cout<<"...breaks: "<<e<<std::endl;
         // e.Disown();
-        // PyConfigure::Exception::Clear();
+        // ConfigurePy::Exception::Clear();
     }
-    
+
     // try{
     //     dict="print __builtin__";
-    //     
-    // }catch(PyConfigure::Exception& e){
+    //
+    // }catch(ConfigurePy::Exception& e){
     //     std::cout<<"ERROR: "<<e<<std::endl;
     // }
-    
-    try{
+
+    try {
         std::cout<<"working construct..."<<std::endl;
         dict="a=5\n"
              "s='hello'\n"
@@ -38,8 +38,10 @@ int main (int /*argc*/, char const * /*argv*/ [])
              ")\n";
         int i = dict["a"];
         std::cout<<"i is "<<i<<std::endl;
+        
+        std::cout<<"d is "<<(std::string)dict["d"]<<std::endl;
 
-        std::string s = dict["s"];        
+        std::string s = dict["s"];
         std::cout<<"s is "<<s<<std::endl;
 
         std::vector<int> v = dict["v"];
@@ -50,6 +52,7 @@ int main (int /*argc*/, char const * /*argv*/ [])
         }
         std::cout<<std::endl;
 
+
         std::vector<std::string> vs = dict["vs"];
         std::cout<<"vs has size "<<vs.size()<<std::endl;
         std::cout<<"and elements: ";
@@ -57,22 +60,22 @@ int main (int /*argc*/, char const * /*argv*/ [])
             std::cout<<vs[i]<<", ";
         }
         std::cout<<std::endl;
-        
+
         double f = dict["f"];
         std::cout<<"f is "<<f<<std::endl;
-        
-        PyConfigure::Dict second = dict["d"];
-        
+
+        ConfigurePy::Dict second = dict["d"];
+
         int a = second["a"];
         std::cout<<"second.a = "<<a<<std::endl;
         std::cout<<"second.a = "<<(int)dict["d"]["a"]<<std::endl;
-                
+
         std::cout<<"...works"<<std::endl;
-    }catch(PyConfigure::Exception& e){
+    } catch(ConfigurePy::Exception& e) {
         std::cout<<"ERROR: "<<e<<std::endl;
         return 1;
     }
- 
-    
+
+
     return 0;
 }

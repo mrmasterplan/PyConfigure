@@ -1,92 +1,83 @@
 #include <Python.h>
-#include "../include/Debug.h"
-#include "../include/PyConfigureException.h"
-#include <string>
 
-namespace PyConfigure {
-    
-    void Exception::ThrowIfRelevant(const char* msg) throw(Exception)
-    {
-        
-        DBG;
-        PyObject* err = PyErr_Occurred();
-        if ( err ) {
-            std::string message;
-            if(msg) message = msg;
-            
-            PyObject *type=NULL, *value=NULL, *trc=NULL;
-            PyErr_Fetch(&type,&value,&trc);
-            
-            #ifdef BUILDTESTS
-            PyErr_Print();
-            #endif
-            
-            if(!msg){
-                // if(type!=NULL){
-                //     message = PyBytes_AsString(type);
-                //     message+=": ";
-                // }
-                message+= PyBytes_AsString(value);
-            }
-            
-            PyErr_Restore(type,value,trc);
-            
-            throw Exception(message.c_str());
+#include "../include/ConfigurePyDict.h"
+
+namespace ConfigurePy
+{
+
+void Exception::ThrowIfRelevant() throw(Exception)
+{
+    PyObject* err = PyErr_Occurred();
+    if ( err ) {
+        std::string message;
+        std::string type_str;
+
+        PyObject *type=NULL, *value=NULL, *trc=NULL;
+        PyErr_Fetch(&type,&value,&trc);
+
+        // PyErr_Print();
+
+        if(type!=NULL) {
+            Ref name = PyObject_GetAttrString(type,"__name__");
+            Ref str = PyObject_Str(name);
+            type_str = PyBytes_AsString(str);
         }
-        DBG;
-    }
-    
-    // void Exception::Clear() throw()
-    // {
-    //     PyErr_Clear();
-    // }
-    
-    void Exception::Disown() throw()
-    {
-        owns_state=0;
-    }
-    
-    Exception::Exception(bool own) throw():
-        owns_state(own)
-    {
-        DBG;
-        // std::cout<<"My Text"<<std::endl;
-    }
-    
-    Exception::Exception(const Exception& o) throw():
-        msg(o.msg),
-        owns_state(o.owns_state)
-    {
-        const_cast<Exception&>(o).owns_state = 0;
-        DBG;
-    }
-    
-    
-    Exception::~Exception() throw()
-    {
-        if(owns_state){
-            // std::cout<<"clearing exception down."<<std::endl;
-            PyErr_Clear();
+        if(value!=0){
+            Ref str = PyObject_Str(value);
+            message = PyBytes_AsString(str);
         }
-        DBG;
+
+        PyErr_Restore(type,value,trc);
+
+        throw Exception(type_str,message);
     }
-    
-    Exception::Exception(const char * _msg, bool own) throw():
-        msg(),
-        owns_state(own)
-    {
-        DBG;
-        if(_msg!=0){
-            // std::cout<<"message is "<<_msg<<std::endl;
-            msg=_msg;
-        }
-        DBG;
+}
+
+void Exception::Disown() throw()
+{
+    owns_state=0;
+}
+
+Exception::Exception(bool own) throw(): owns_state(own) {}
+
+Exception::Exception(const Exception& o) throw():
+    type(o.type),
+    msg(o.msg),
+    owns_state(o.owns_state)
+{
+    const_cast<Exception&>(o).Disown();
+}
+
+
+Exception::~Exception() throw()
+{
+    if(owns_state) {
+        PyErr_Clear();
     }
+}
+
+Exception::Exception(std::string _type, std::string _msg, bool own) throw():
+    type(_type),
+    msg(_msg),
+    owns_state(own)
+{
     
-    Exception::operator const char*() throw()
-    {
-        DBG;
-        return msg.c_str();
-    }
-    
+}
+
+const char* Exception::Message() const throw()
+{
+    return msg.c_str();
+}
+
+const char* Exception::Type() const throw()
+{
+    return type.c_str();
+}
+
+
+Exception::operator const char*() const throw()
+{
+    return (type+": "+msg).c_str();
+}
+
 }
