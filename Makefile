@@ -26,11 +26,11 @@ SKIPCPPLIST = $(BINCPPFILE) $(TESTCPPFILE) $(SRCDIR)/$(CENTER_FILE).cpp
 SKIPHLIST   = 
 SHLIBFILE = ./lib/lib$(LIBRARY).so
 
-CXXFLAGS += -O2 -pipe -Wall -W -Woverloaded-virtual -pthread -m64 -I /Library/Frameworks/Python.framework/Versions/2.7/include/python2.7/ -Wall -Wno-overloaded-virtual -Wno-unused
+CXXFLAGS += -O2 -pipe -Wall -W -Woverloaded-virtual -pthread -m64 $(shell python-config --includes) -Wall -Wno-overloaded-virtual -Wno-unused
 # CXXFLAGS += -O2 -pipe -Wall -W -Woverloaded-virtual -pthread -m64 -I/Users/simon/software/root/clang/include -Wall -Wno-overloaded-virtual -Wno-unused
 CPP = clang -E
 LD = clang++
-LDFLAGS = -O2 -m64 -lpython2.7
+LDFLAGS = -O2 -m64 $(shell python-config --libs)
 SOFLAGS = -dynamiclib -single_module -install_name $(PWD)/$(SHLIBFILE)
 
 default: shlib bin
@@ -78,12 +78,12 @@ $(DEPDIR)/%.d: %.cpp
 # Rule to comile the executable
 $(EXECUTABLE): $(EXECUTABLE).o $(SHLIBFILE)
 	@echo "Making $(EXECUTABLE)"
-	@clang++ -L$(dir $(SHLIBFILE)) -l$(LIBRARY) -o $@ $(OBJDIR)/$(EXECUTABLE).o
+	@clang++ -L$(dir $(SHLIBFILE)) -l$(LIBRARY) -o $@ $(OBJDIR)/$(EXECUTABLE).o $(CXXFLAGS)
 
 # Rule to comile the tests
 $(TESTFILE): $(TEST_O) $(SHLIBFILE)
 	@echo "Making $(TESTFILE)"
-	@clang++ -L$(dir $(SHLIBFILE)) -l$(LIBRARY) -o $@ $(OBJDIR)/$(TEST_O)
+	@clang++ -L$(dir $(SHLIBFILE)) -l$(LIBRARY) -o $@ $(OBJDIR)/$(TEST_O) $(CXXFLAGS)
 
 # Rule to combine objects into a unix shared library
 $(SHLIBFILE): $(OLIST) $(CENTER_O)
@@ -91,7 +91,7 @@ $(SHLIBFILE): $(OLIST) $(CENTER_O)
 	@rm -f $(SHLIBFILE)
 	@mkdir -p $(dir $(SHLIBFILE))
 # ifneq (,$(findstring macosx,$(ARCH)))
-	@$(LD) $(LDFLAGS) -dynamiclib -single_module -undefined dynamic_lookup $(addprefix $(OBJDIR)/,$(OLIST)) $(OBJDIR)/$(CENTER_O) -o $(SHLIBFILE)
+	@$(LD) $(LDFLAGS) -dynamiclib -single_module -undefined dynamic_lookup $(addprefix $(OBJDIR)/,$(OLIST)) $(OBJDIR)/$(CENTER_O) -o $(SHLIBFILE) $(CXXFLAGS)
 # else
 #	$(LD) $(LDFLAGS) $(SOFLAGS) $(addprefix $(OBJDIR)/,$(OLIST)) $(OBJDIR)/$(CENTER_O) -o $(SHLIBFILE)
 # endif

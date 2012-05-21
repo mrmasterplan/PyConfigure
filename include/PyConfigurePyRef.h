@@ -15,6 +15,8 @@ namespace PyConfigure {
         operator PyObject*() const;
         
         operator bool() const { return data;};
+
+        void Inc() throw();
         
         void Dec() throw();
         

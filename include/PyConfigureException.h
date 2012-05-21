@@ -9,15 +9,19 @@ namespace PyConfigure {
     {
     public:
         static void ThrowIfRelevant(const char* message=0) throw(Exception);
+        // static void Clear() throw();
 
-        Exception() throw();
-        Exception(const char * _msg) throw();
+        Exception(bool owner = 1) throw();
+        Exception(const char * _msg,bool owner = 1) throw();
         Exception(const Exception& o) throw();
         virtual ~Exception() throw();
         operator const char*() throw();
         
+        void Disown() throw();
+        
     private:
         std::string msg;
+        bool owns_state;
     };
 
 }

@@ -11,6 +11,7 @@ namespace PyConfigure {
     class Dict{
     public:
         Dict() throw();
+        Dict(PyObject*) throw();
         Dict(const Dict&) throw();
         ~Dict() throw();
     
@@ -21,6 +22,7 @@ namespace PyConfigure {
         Result operator[] (const char*) throw(Exception);
 
     private:
+        void InitPy() throw();
         PyRef m_py_dict;
     };
 

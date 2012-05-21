@@ -29,6 +29,15 @@ namespace PyConfigure {
         }
         data = NULL;
     }
+
+    void PyRef::Inc() throw()
+    {
+        if(data != NULL){
+            // std::cout<<"decrementing "<<data<<std::endl;
+            
+            Py_INCREF(data);
+        }
+    }
     
     
     PyRef& PyRef::operator=(PyObject* obj) throw()

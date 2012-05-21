@@ -6,14 +6,34 @@
 
 namespace PyConfigure {
     
-    Dict::Dict() throw()
+    Dict::Dict() throw():
+        m_py_dict()
     {
-        if(not Py_IsInitialized())
-            Py_Initialize();
-        /*no code*/
+        InitPy();
     }
 
-    Dict::Dict(const Dict&) throw(){}
+    Dict::Dict(PyObject* o) throw():
+        m_py_dict(o)
+    {
+        InitPy();
+        m_py_dict.Inc();
+    }
+
+    Dict::Dict(const Dict& other) throw():
+        m_py_dict(other.m_py_dict)
+    {
+        InitPy();
+        m_py_dict.Inc();
+    }
+    void Dict::InitPy() throw()
+    {
+        if(not Py_IsInitialized()){
+            std::cout<<"Initializing Python..."<<std::endl;
+            Py_Initialize();
+            
+        }
+    }
+    
     
     Dict::~Dict() throw()
     {
@@ -32,13 +52,16 @@ namespace PyConfigure {
     Dict& Dict::operator = (const char* code) throw(Exception)
     {
         DBG;
-        m_py_dict = Py_BuildValue("{}");
+        // m_py_dict = Py_BuildValue("{}");
+        m_py_dict = PyDict_New();
         Exception::ThrowIfRelevant();
         DBG;
         
-        PyRef globals = Py_BuildValue("{}");
+        PyRef globals = PyDict_New();
         Exception::ThrowIfRelevant();
         DBG;
+        PyDict_SetItemString(globals, "__builtins__", PyEval_GetBuiltins());
+        Exception::ThrowIfRelevant();
         
         PyRef retstr = PyRun_StringFlags(code,Py_file_input,globals,m_py_dict,0);
         Exception::ThrowIfRelevant();
@@ -47,9 +70,11 @@ namespace PyConfigure {
         return *this;           
     }
 
-    Result Dict::operator[] (const char*) throw(Exception)
+    Result Dict::operator[] (const char* key) throw(Exception)
     {
-        return Result();
+        PyRef obj = PyDict_GetItemString(m_py_dict, key);
+        Exception::ThrowIfRelevant();
+        return Result(obj.Steal());
     }
 
 }

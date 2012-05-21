@@ -21,7 +21,13 @@ namespace PyConfigure {
             PyErr_Print();
             #endif
             
-            if(!msg) message = PyBytes_AsString(value);
+            if(!msg){
+                // if(type!=NULL){
+                //     message = PyBytes_AsString(type);
+                //     message+=": ";
+                // }
+                message+= PyBytes_AsString(value);
+            }
             
             PyErr_Restore(type,value,trc);
             
@@ -30,25 +36,44 @@ namespace PyConfigure {
         DBG;
     }
     
-    Exception::Exception() throw()
+    // void Exception::Clear() throw()
+    // {
+    //     PyErr_Clear();
+    // }
+    
+    void Exception::Disown() throw()
+    {
+        owns_state=0;
+    }
+    
+    Exception::Exception(bool own) throw():
+        owns_state(own)
     {
         DBG;
         // std::cout<<"My Text"<<std::endl;
     }
     
     Exception::Exception(const Exception& o) throw():
-        msg(o.msg)
+        msg(o.msg),
+        owns_state(o.owns_state)
     {
+        const_cast<Exception&>(o).owns_state = 0;
         DBG;
     }
     
     
     Exception::~Exception() throw()
     {
+        if(owns_state){
+            // std::cout<<"clearing exception down."<<std::endl;
+            PyErr_Clear();
+        }
         DBG;
     }
     
-    Exception::Exception(const char * _msg) throw()
+    Exception::Exception(const char * _msg, bool own) throw():
+        msg(),
+        owns_state(own)
     {
         DBG;
         if(_msg!=0){
