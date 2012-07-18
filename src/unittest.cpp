@@ -19,13 +19,6 @@ int main (int /*argc*/, char const * /*argv*/ [])
         // ConfigurePy::Exception::Clear();
     }
 
-    // try{
-    //     dict="print __builtin__";
-    //
-    // }catch(ConfigurePy::Exception& e){
-    //     std::cout<<"ERROR: "<<e<<std::endl;
-    // }
-
     try {
         std::cout<<"working construct..."<<std::endl;
         dict="a=5\n"

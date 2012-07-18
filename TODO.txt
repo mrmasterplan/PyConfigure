@@ -26,3 +26,5 @@ My thoughts:
     or from a python api, without having to pass down a lot of individual config options.
 /Simon
 
+all done :)
+
